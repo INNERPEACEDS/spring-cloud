@@ -1,0 +1,44 @@
+server:
+  port: 10002
+
+spring:
+  application:
+    name: provider-02
+    provider-name: provider-name
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        register: true
+        serviceName: ${spring.application.provider-name}
+        healthCheckPath: /actuator/health
+        healthCheckInterval: 15s
+        tags: urlprefix-/${spring.application.provider-name}
+        hostname: localhost
+        instanceId: ${spring.application.provider-name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+
+ribbon:
+  ReadTimeout: 30000
+  ConnectTimeout: 10000
+  SocketTimeout: 10000
+  OkToRetryOnAllOperations: false
+  MaxAutoRetries: 1
+  MaxAutoRetriesNextServer: 2
+  retryableStatusCodes: 404,502,500
+
+# hystrix的超时时间
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 120000
+
+#logging:
+#  config: classpath:log4j2.xml
+
+
